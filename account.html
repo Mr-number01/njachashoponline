@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration Form</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color:#19b31965;
+        }
+        nav {
+            background: #333;
+            padding: 10px;
+            text-align: center;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        section {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px 0px #ccc;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    
+    <section id="register">
+        <h2>Register Here</h2>
+        <form id="registrationForm">
+            <label for="fullName">Full Name:</label>
+            <input type="text" id="fullName" name="fullName" required pattern="^[A-Za-z ]+$">
+
+            <label for="regNumber">Registration Number:</label>
+            <input type="text" id="regNumber" name="regNumber" required pattern="BCS-\d{2}-\d{4}-\d{4}">
+
+            <label for="sex">Sex:</label>
+            <select id="sex" name="sex" required>
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="region">Region:</label>
+            <select id="region" name="region" required>
+                <option value="">Select Region</option>
+            </select>
+
+            <label for="district">District:</label>
+            <select id="district" name="district" required>
+                <option value="">Select District</option>
+            </select>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required minlength="8">
+
+            <label for="confirmPassword">Confirm Password:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+
+            <button type="submit">Register</button>
+        </form>
+    </section>
+    
+    <script>
+        $(document).ready(function() {
+            // Load regions dynamically
+            $.ajax({
+                url: 'regions.json',
+                method: 'GET',
+                success: function(data) {
+                    $.each(data, function(index, region) {
+                        $('#region').append('<option value="' + region.name + '">' + region.name + '</option>');
+                    });
+                }
+            });
+
+            // Load districts dynamically based on region selection
+            $('#region').change(function() {
+                var regionSelected = $(this).val();
+                $('#district').html('<option value="">Select District</option>');
+                
+                $.ajax({
+                    url: 'districts.json',
+                    method: 'GET',
+                    success: function(data) {
+                        $.each(data, function(index, district) {
+                            if (district.region == regionSelected) {
+                                $('#district').append('<option value="' + district.name + '">' + district.name + '</option>');
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Password validation
+            $('#registrationForm').submit(function(event) {
+                var password = $('#password').val();
+                var confirmPassword = $('#confirmPassword').val();
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match!');
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
